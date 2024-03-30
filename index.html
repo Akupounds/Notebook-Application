@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notebook App</title>
+
+  <!-- Include updated style.css -->
+  <style>
+    /* Updated style.css code */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: black; /* Set background color to black */
+      color: white; /* Set text color to white */
+    }
+
+    #root {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: white; /* Set background color to white */
+      color: black; /* Set text color to black */
+    }
+
+    button {
+      padding: 8px 16px;
+      background-color: #ff69b4; /* Set button background color to pink */
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ff1493; /* Set button hover background color to a darker shade of pink */
+    }
+
+    select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .note {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .note-content {
+      font-size: 16px;
+    }
+
+    .note img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+    }
+
+    .note button {
+      margin-right: 10px;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Include React and ReactDOM libraries -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+  <!-- Include Babel standalone library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+
+  <!-- Include script.js -->
+  <script type="text/babel">
+    function NotebookApp() {
+      const [notes, setNotes] = React.useState([
+        { id: 1, content: "Sample note 1", font: "Arial", image: null },
+        { id: 2, content: "Sample note 2", font: "Times New Roman", image: null }
+      ]);
+      const [newNote, setNewNote] = React.useState("");
+      const [selectedFont, setSelectedFont] = React.useState("Arial");
+
+      const handleChangeFont = (noteId, newFont) => {
+        setNotes(prevNotes =>
+          prevNotes.map(note =>
+            note.id === noteId ? { ...note, font: newFont } : note
+          )
+        );
+      };
+
+      const handleAddImage = (noteId, imageFile) => {
+        const imageUrl = URL.createObjectURL(imageFile);
+        setNotes(prevNotes =>
+          prevNotes.map(note =>
+            note.id === noteId ? { ...note, image: imageUrl } : note
+          )
+        );
+      };
+
+      const handleAddNote = () => {
+        if (newNote.trim() !== "") {
+          setNotes(prevNotes => [
+            ...prevNotes,
+            { id: Date.now(), content: newNote, font: selectedFont, image: null }
+          ]);
+          setNewNote("");
+        }
+      };
+
+      const handleDeleteNote = (noteId) => {
+        setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
+      };
+
+      return (
+        <div>
+          <h1>Notebook</h1>
+          <div>
+            <textarea
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              placeholder="Enter your note..."
+            />
+            <button onClick={handleAddNote}>Add Note</button>
+          </div>
+          <div>
+            <select value={selectedFont} onChange={(e) => setSelectedFont(e.target.value)}>
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Verdana">Verdana</option>
+              <option value="Courier New">Courier New</option>
+            </select>
+            <span>Selected Font: {selectedFont}</span>
+          </div>
+          <div>
+            {notes.map(note => (
+              <div className="note" key={note.id}>
+                <div className="note-content" style={{ fontFamily: note.font }}>
+                  {note.content}
+                </div>
+                {note.image && <img src={note.image} alt="Note" />}
+                <button onClick={() => handleChangeFont(note.id, "Arial")}>Change Font to Arial</button>
+                <button onClick={() => handleDeleteNote(note.id)}>Delete</button>
+                <input type="file" accept="image/*" onChange={(e) => handleAddImage(note.id, e.target.files[0])} />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<NotebookApp />, document.getElementById('root'));
+  </script>
+</body>
+</html>
